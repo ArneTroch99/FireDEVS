@@ -19,6 +19,7 @@ public class Tree extends TwoDimCell {
 
 	public Tree(int xcoord, int ycoord) {
 		super(xcoord, ycoord);
+		System.out.println("test");
 		addTestInput("inN", new Pair("status", "fire"));
 
 		// Add ports not in TwoDimCell
