@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry including="**/*.css|**/*.fxml|**/*.java" kind="src" output="target/classes" path="src">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="Models"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX11"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/chartengineapi.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/com.ibm.icu_58.2.0.v20170418-1837.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/gson-2.8.3.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/gson-2.8.3-sources.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/js.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.birt.chart.device.extension_4.8.0.v201806261756.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.birt.chart.device.swt_4.8.0.v201806261756.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.birt.chart.engine_4.8.0.v201806261756.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.birt.chart.engine.extension_4.8.0.v201806261756.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.birt.chart.timeview.event_1.0.0.201905311724.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.birt.chart.timeview.piecewiseconstant_1.0.0.201905311724.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.birt.chart.ui_4.8.0.v201806261756.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.birt.chart.ui.extension_4.8.0.v201806261756.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.birt.core_4.8.0.v201806261756.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.birt.core.ui_4.8.0.v201806261756.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.core.commands_3.9.100.v20180404-1234.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.core.contenttype_3.7.0.v20180426-1644.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.core.jobs_3.10.0.v20180427-1454.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.core.runtime_3.14.0.v20180417-0825.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.e4.ui.workbench3_0.14.100.v20180403-0945.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.emf.common_2.14.0.v20180527-1134.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.emf.ecore_2.14.0.v20180529-1144.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.emf.ecore.xmi_2.14.0.v20180129-1548.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.equinox.app_1.3.500.v20171221-2204.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.equinox.common_3.10.0.v20180412-1130.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.equinox.preferences_3.7.100.v20180510-1129.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.equinox.registry_3.8.0.v20180426-1327.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.jface_3.14.0.v20180423-0714.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.osgi_3.13.0.v20180409-1500.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.osgi.compatibility.state_1.1.100.v20180331-1743.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.swt_3.107.0.v20180611-0422.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.swt.win32.win32.x86_64_3.107.0.v20180611-0422.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.ui_3.109.100.v20180426-0903.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/org.eclipse.ui.workbench_3.111.0.v20180524-1156.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/postgresql-42.2.14.jar"/>
+	<classpathentry kind="lib" path="DEVS_Suite_6.0.0_lib/DEVS-View-20200904.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>
