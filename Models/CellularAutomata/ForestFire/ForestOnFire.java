@@ -24,11 +24,8 @@ public class ForestOnFire extends TwoDimCellSpace {
 				addCell(tree);
 			}
 		}
-
 		// Do the couplings
-
 		doNeighborToNeighborCoupling();
-
 	}
 
     /**

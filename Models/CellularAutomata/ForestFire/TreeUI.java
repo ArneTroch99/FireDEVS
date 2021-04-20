@@ -8,6 +8,7 @@ public class TreeUI {
 		CAViewUI.addPhaseColor("tree", Color.GREEN);
 		CAViewUI.addPhaseColor("passive", Color.WHITE);
 		CAViewUI.addPhaseColor("fire", Color.RED);
+
 	}
 	
 }
