@@ -34,6 +34,9 @@ public class EnvironmentCell extends TwoDimCell {
     private double height = 5;
     // Possible states for the cell (unburned, unburnable, burning, burned)
     private State state;
+
+    private boolean startFire;
+
     // Rothermel variables
     private double w_o;
     private double sigma;
@@ -78,8 +81,13 @@ public class EnvironmentCell extends TwoDimCell {
      */
     public void initialize() {
         super.initialize();
+        if (startFire){
+            state = State.BURNING;
+            calculateTimers("N");
+        } else {
+            state = State.UNBURNED;
+        }
         Logging.log("-- " + this.getName() + "| Initializing cell in state: " + state);
-        state = State.UNBURNED;
         dirOutputs.put("N", new String[]{"NE", "E", "SE", "S", "SW", "W", "NW"});
         dirOutputs.put("E", new String[]{"N", "NE", "SE", "S", "SW", "W", "NW"});
         dirOutputs.put("S", new String[]{"N", "NE", "E", "SE", "SW", "W", "NW"});
@@ -239,6 +247,10 @@ public class EnvironmentCell extends TwoDimCell {
             }
         });
         return m;
+    }
+
+    public void setStartFire(boolean startFire) {
+        this.startFire = startFire;
     }
 
     enum State {
