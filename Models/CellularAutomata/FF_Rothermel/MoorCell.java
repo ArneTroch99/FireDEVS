@@ -22,7 +22,7 @@ public class MoorCell extends TwoDimCell {
     // Cell variables
     private double width = 5;
     private double height = 5;
-    private String state;  // Possible states: unburned, unburnable, burning, burned
+    private State state;  // Possible states: unburned, unburnable, burning, burned
     private double windDir = -Math.PI / 2;  // The direction of the wind
     private List<String> ignitePositions = new ArrayList<>();  // The positions where the cell has been ignited
     // The timers to keep track of when a certain output will be ignited
@@ -35,11 +35,10 @@ public class MoorCell extends TwoDimCell {
     // (h/2, 0)         (h/2, w)
     // (h, 0)  (h, w/2) (h, w)
     private Map<String, double[]> dirPositions = new HashMap<>(8);
-
-
     public MoorCell() {
         this(0, 0);
     }
+
 
     public MoorCell(int xcoord, int ycoord) {
         super(xcoord, ycoord);
@@ -62,16 +61,15 @@ public class MoorCell extends TwoDimCell {
     public static void main(String[] args) {
         MoorCell cell = new MoorCell();
         cell.initialize();
-        cell.calculateTimers("N");
+        cell.calculateTimers("NE");
     }
-
 
     /**
      * Initialization method
      */
     public void initialize() {
         //super.initialize();
-        state = "unburned";
+        state = State.UNBURNED;
         outputDirs.put("N", new String[]{"NE", "E", "SE", "S", "SW", "W", "NW"});
         outputDirs.put("E", new String[]{"N", "NE", "SE", "S", "SW", "W", "NW"});
         outputDirs.put("S", new String[]{"N", "NE", "E", "SE", "SW", "W", "NW"});
@@ -81,37 +79,36 @@ public class MoorCell extends TwoDimCell {
         outputDirs.put("SW", new String[]{"N", "NE", "E", "SE", "NW"});
         outputDirs.put("NW", new String[]{"NE", "E", "SE", "S", "SW"});
 
-        dirPositions.put("N", new double[]{0, width / 2});
-        dirPositions.put("E", new double[]{-height / 2, width});
-        dirPositions.put("S", new double[]{-height, width / 2});
-        dirPositions.put("W", new double[]{-height / 2, 0});
-        dirPositions.put("NE", new double[]{0, width});
-        dirPositions.put("SE", new double[]{-height, width});
-        dirPositions.put("SW", new double[]{-height, 0});
+        dirPositions.put("N", new double[]{width / 2, 0});
+        dirPositions.put("E", new double[]{width, -height / 2});
+        dirPositions.put("S", new double[]{width / 2, -height});
+        dirPositions.put("W", new double[]{0, -height / 2});
+        dirPositions.put("NE", new double[]{width, 0});
+        dirPositions.put("SE", new double[]{width, -height});
+        dirPositions.put("SW", new double[]{0, -height});
         dirPositions.put("NW", new double[]{0, 0});
 
     }
 
     /**
      * External Transition Function
-     * <p>
      * Receive an ignite command from a neighbouring cell. Store this starting position of ignition.
      */
     public void deltext(double e, message x) {
         Continue(e);
         for (Object o : x) {
             content c = (content) o;
-            if (!state.equals("unburnable")) {
+            if (!state.equals(State.UNBURNABLE)) {
                 if (c.getValue().equals("ignite")) {
                     System.out.println(this.getName() + "| received ignite command from " + c.getPortName());
                     ignitePositions.add(c.getPortName());
                     System.out.println(this.getName() + "| transitioning to burning state");
-                    state = "burning";
+                    state = State.BURNING;
                     System.out.println(this.getName() + "| setting original timers");
                     calculateTimers(c.getPortName());
                 }
             }
-            holdIn(state, 1);
+            holdIn(state.toString(), 1);
         }
     }
 
@@ -126,7 +123,7 @@ public class MoorCell extends TwoDimCell {
         List<Double> distances = new ArrayList<>(targetDirs.size());
         for (String t : targetDirs) {
             angles.add(Math.atan2((dirPositions.get(t)[1] - dirPositions.get(initPos)[1]), (dirPositions.get(t)[0] - dirPositions.get(initPos)[0])));
-            distances.add(Math.sqrt((dirPositions.get(initPos)[0] - dirPositions.get(t)[0]) * (dirPositions.get(initPos)[0] - dirPositions.get(t)[0]) + (dirPositions.get(initPos)[1] - dirPositions.get(t)[1]) * (dirPositions.get(initPos)[1] - dirPositions.get(t)[1])));
+            distances.add(AbsurdUnitConverter.m_to_ft(Math.sqrt((dirPositions.get(initPos)[0] - dirPositions.get(t)[0]) * (dirPositions.get(initPos)[0] - dirPositions.get(t)[0]) + (dirPositions.get(initPos)[1] - dirPositions.get(t)[1]) * (dirPositions.get(initPos)[1] - dirPositions.get(t)[1]))));
         }
         System.out.println("-- " + this.getName() + "| Angles were calulated! " + angles.toString());
         System.out.println("-- " + this.getName() + "| Distances were calulated! " + distances.toString());
@@ -134,20 +131,24 @@ public class MoorCell extends TwoDimCell {
         // Update the angles to the "new" coordinate system
         angles = angles.stream().map(a -> {
             double angleDiff = a - windDir;
-            System.out.println(angleDiff);
-            angleDiff += (angleDiff > Math.PI) ? (-2 * Math.PI) : (a < -Math.PI) ? (2 * Math.PI) : 0;
-            return angleDiff + Math.PI;
+            angleDiff += (angleDiff > Math.PI) ? (-2 * Math.PI) : (angleDiff < -Math.PI) ? (2 * Math.PI) : 0;
+            return angleDiff;
         }).collect(Collectors.toList());
         System.out.println("-- " + this.getName() + "| Angles were adjusted! " + angles.toString());
 
+        angles.forEach(a -> {
+            assert (a <= Math.PI && a >= -Math.PI);
+        });
+
         // Calculate the scaled angles using the ellipse
-        double e = 0.9;
+        double e = 0.99;
         List<Double> scaledAngles = new ArrayList<>(targetDirs.size());
+        assert (e > 0.0 && e < 1.0);
         for (Double a : angles) {
-            scaledAngles.add((1 - e * e) * (1 - e * Math.cos(a)));
+            scaledAngles.add((1 - e * e) * (1 - e * Math.cos(a + Math.PI)));
         }
         System.out.println("-- " + this.getName() + "| Angles were scaled! " + scaledAngles.toString());
-        double maxAngle = ((1 - e * e) * (1 - e * Math.cos(-Math.PI / 2)));
+        double maxAngle = ((1 - e * e) * (1 - e * Math.cos(Math.PI)));
         scaledAngles = scaledAngles.stream().map(a -> a / maxAngle).collect(Collectors.toList());
         System.out.println("-- " + this.getName() + "| Angles were normalized! " + scaledAngles.toString());
 
@@ -158,9 +159,7 @@ public class MoorCell extends TwoDimCell {
         }
         System.out.println("-- " + this.getName() + "| Timings were calculated! " + outputTimers.toString());
 
-
     }
-
 
     /**
      * Internal Transition Function
@@ -169,5 +168,13 @@ public class MoorCell extends TwoDimCell {
         if (state.equals("burning")) {
 
         }
+    }
+
+
+    enum State {
+        BURNED,
+        UNBURNED,
+        UNBURNABLE,
+        BURNING
     }
 }
