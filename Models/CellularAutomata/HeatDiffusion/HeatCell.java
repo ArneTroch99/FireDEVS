@@ -99,11 +99,6 @@ public class HeatCell extends TwoDimCell {
      * Internal Transition Function
      */
 
-    public void deltint() {
-
-        holdIn(phase, INFINITY);
-    }
-
     public void deltcon(double e, message x) {
         deltint();
         deltext(0, x);
