@@ -19,7 +19,7 @@ public class Logging
      * More may be added as necessary.
      */
     static public final int full = 100, none = 0, errorsOnly = 10, inputViolations = 20,
-                            info = 5, debug = 4, warning = 3, fatal = 2;
+                            debug = 5, info = 4, warning = 3, error = 2, fatal = 1;
 
     /**
      * The current logging level used throughout the GenDevs code.  This
