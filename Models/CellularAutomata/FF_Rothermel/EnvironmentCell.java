@@ -15,7 +15,7 @@ public class EnvironmentCell extends TwoDimCell {
     private final double e = 0.9; // Determines the layout of the ellipse TODO: change this value based on the wind speed
 
     // Cell-variables
-    // The positions where the cell has been ignited TODO: allow the cell to be ignited from multiple directions
+    // The positions where the cell has been ignited
     private final List<String> ignitePositions = new ArrayList<>();
     // The timers to keep track of when a certain output will be ignited
     // NW N NE      (0, 0)  (w/2, 0) (w, 0)
@@ -102,7 +102,7 @@ public class EnvironmentCell extends TwoDimCell {
     public void deltext(double e, message x) {
         String port = "";
         for (int i = 0; i < x.getLength(); i++) {
-            if (state.equals(State.UNBURNED)) {
+            if (state.equals(State.UNBURNED) || state.equals(State.BURNING)) {
                 if (somethingOnPort(x, "inN")) {
                     inpair = (Pair) x.getValOnPort("inN", i);
                     port = "N";
@@ -130,7 +130,6 @@ public class EnvironmentCell extends TwoDimCell {
                 }
                 if (inpair != null && inpair.getValue().toString().equals("ignite")) {
                     Logging.log("-- " + this.getName() + "| received ignite command from " + port, 4);
-                    // TODO: add multiple triggers
                     ignitePositions.add(port);
                     Logging.log("-- " + this.getName() + "| transitioning to burning state", 4);
                     state = State.BURNING;
@@ -186,16 +185,21 @@ public class EnvironmentCell extends TwoDimCell {
         Logging.log("-- " + this.getName() + "| Angles were normalized! " + scaledAngles.toString(), 4);
 
         // TODO: Calculate the current ROS
-        double ros = 20;
+        double ros = 4;
         for (int i = 0; i < targetDirs.size(); i++) {
-            outputTimers.put(targetDirs.get(i), (distances.get(i) / (ros * scaledAngles.get(i))) * 60.0);
+            double newTime = (distances.get(i) / (ros * scaledAngles.get(i))) * 60.0;
+            String target = targetDirs.get(i);
+            if ((outputTimers.get(target) == null) || (newTime < outputTimers.get(target)) && !(outputTimers.get(target) <= 0)){
+                outputTimers.put(target, newTime);
+            }
         }
+        outputTimers.put(initPos, 0.0);
         Logging.log("-- " + this.getName() + "| Timings were calculated! " + outputTimers.toString(), 4);
     }
 
     /**
      * Internal Transition Function
-     * Tick down the timers each step with a value of e
+     * Tick down the timers each step with a value of sigma
      */
     public void deltint() {
         if (this.state.equals(State.BURNING)) {
