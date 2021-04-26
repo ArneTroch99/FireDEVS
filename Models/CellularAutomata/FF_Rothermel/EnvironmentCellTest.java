@@ -6,22 +6,22 @@ import model.modeling.CAModels.TwoDimCellSpace;
 public class EnvironmentCellTest extends TwoDimCellSpace {
 
     public EnvironmentCellTest() {
-        this(10, 10);
+        this(100, 100);
     }
 
     public EnvironmentCellTest(int xDim, int yDim) {
         super("moor", xDim, yDim);
         this.numCells = xDim * yDim;
+        CellUtils.init(2, 2);
         for (int i = 0; i < xDimCellspace; i++) {
             for (int j = 0; j < yDimCellspace; j++) {
                 EnvironmentCell cell = new EnvironmentCell(i, j);
                 addCell(cell);
-                if (i == 0 && j == 0) {
+                if (i == 49 && j == 49){
                     cell.setStartFire(true);
                 }
             }
         }
-        addTestInput("inN", new Pair<>("status", "ignite"));
         doNeighborToNeighborCoupling();
     }
 

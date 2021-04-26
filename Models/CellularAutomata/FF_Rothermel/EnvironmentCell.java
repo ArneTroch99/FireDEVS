@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 public class EnvironmentCell extends TwoDimCell {
 
     // Environmental variables
-    private final double windDir = -Math.PI / 2;  // The direction of the wind TODO: Change based on wind direction
-    private final double e = 0.99; // Determines the layout of the ellipse TODO: change this value based on the wind speed
+    private final double windDir = -Math.PI / 4;  // The direction of the wind TODO: Change based on wind direction
+    private final double e = 0.9; // Determines the layout of the ellipse TODO: change this value based on the wind speed
 
     // Cell-variables
     // The positions where the cell has been ignited TODO: allow the cell to be ignited from multiple directions
@@ -22,20 +22,14 @@ public class EnvironmentCell extends TwoDimCell {
     // W     E      (0, h/2)         (w, h/2)
     // SW S SE      (0, h)  (w/2, h) (w, h)
     private final Map<String, Double> outputTimers = new HashMap<>();
-    // The coordinate positions of the different directions
-    private final Map<String, double[]> dirCoordinates = new HashMap<>(8);
     // List to determine if an ignite command has been sent to an output (based on the order of outputTimers)
     private final List<String> igniteSent = new ArrayList<>();
-    // The output directions for each possible input location
-    HashMap<String, String[]> dirOutputs = new HashMap<>(8);
-    // Width of the cell
-    private double width = 5;
-    // Height of the cell
-    private double height = 5;
     // Possible states for the cell (unburned, unburnable, burning, burned)
     private State state;
 
     private boolean startFire;
+
+    private double sigma_time = 1; // Timestep in seconds
 
     // Rothermel variables
     private double w_o;
@@ -53,10 +47,9 @@ public class EnvironmentCell extends TwoDimCell {
 
     public EnvironmentCell(int xcoord, int ycoord) {
         super(xcoord, ycoord);
-        addTestInput("inN", new Pair<>("status", "ignite"));
     }
 
-    public EnvironmentCell(int xcoord, int ycoord, double w_o, double sigma, double h, double M_f, double U, double beta, double M_x, double width, double height, ROS_Calculator rosCalculator) {
+    public EnvironmentCell(int xcoord, int ycoord, double w_o, double sigma, double h, double M_f, double U, double beta, double M_x, ROS_Calculator rosCalculator) {
         super(xcoord, ycoord);
         this.w_o = w_o;
         this.sigma = sigma;
@@ -65,15 +58,7 @@ public class EnvironmentCell extends TwoDimCell {
         this.U = U;
         this.beta = beta;
         this.M_x = M_x;
-        this.width = width;
-        this.height = height;
         this.rosCalculator = rosCalculator;
-    }
-
-    public static void main(String[] args) {
-        EnvironmentCell cell = new EnvironmentCell();
-        cell.initialize();
-        cell.calculateTimers("NE");
     }
 
     /**
@@ -81,32 +66,24 @@ public class EnvironmentCell extends TwoDimCell {
      */
     public void initialize() {
         super.initialize();
-        if (startFire){
+        Logging.log("-- " + this.getName() + "| Initializing cell in state: " + state, 5);
+
+        if (startFire) {
             state = State.BURNING;
-            calculateTimers("N");
+            ignitePositions.add("C");
+            calculateTimers("C");
+            holdIn("START", sigma_time);
         } else {
-            state = State.UNBURNED;
+            // Temporary way to add some unburnable cells
+            Random rand = new Random();
+            if (rand.nextInt(100) < 5) {
+                state = State.UNBURNABLE;
+            } else {
+                state = State.UNBURNED;
+            }
+            holdIn(state.toString(), INFINITY);
         }
-        Logging.log("-- " + this.getName() + "| Initializing cell in state: " + state);
-        dirOutputs.put("N", new String[]{"NE", "E", "SE", "S", "SW", "W", "NW"});
-        dirOutputs.put("E", new String[]{"N", "NE", "SE", "S", "SW", "W", "NW"});
-        dirOutputs.put("S", new String[]{"N", "NE", "E", "SE", "SW", "W", "NW"});
-        dirOutputs.put("W", new String[]{"N", "NE", "E", "SE", "S", "SW", "NW"});
-        dirOutputs.put("NE", new String[]{"SE", "S", "SW", "W", "NW"});
-        dirOutputs.put("SE", new String[]{"N", "NE", "SW", "W", "NW"});
-        dirOutputs.put("SW", new String[]{"N", "NE", "E", "SE", "NW"});
-        dirOutputs.put("NW", new String[]{"NE", "E", "SE", "S", "SW"});
 
-        dirCoordinates.put("N", new double[]{width / 2, 0});
-        dirCoordinates.put("E", new double[]{width, -height / 2});
-        dirCoordinates.put("S", new double[]{width / 2, -height});
-        dirCoordinates.put("W", new double[]{0, -height / 2});
-        dirCoordinates.put("NE", new double[]{width, 0});
-        dirCoordinates.put("SE", new double[]{width, -height});
-        dirCoordinates.put("SW", new double[]{0, -height});
-        dirCoordinates.put("NW", new double[]{0, 0});
-
-        holdIn(state.toString(), INFINITY);
         EnvironmentCellUI.setPhaseColor();
     }
 
@@ -125,7 +102,7 @@ public class EnvironmentCell extends TwoDimCell {
     public void deltext(double e, message x) {
         String port = "";
         for (int i = 0; i < x.getLength(); i++) {
-            if (!state.equals(State.UNBURNABLE) && !state.equals(State.BURNED)) {
+            if (state.equals(State.UNBURNED)) {
                 if (somethingOnPort(x, "inN")) {
                     inpair = (Pair) x.getValOnPort("inN", i);
                     port = "N";
@@ -152,34 +129,38 @@ public class EnvironmentCell extends TwoDimCell {
                     port = "NW";
                 }
                 if (inpair != null && inpair.getValue().toString().equals("ignite")) {
-                    Logging.log("-- " + this.getName() + "| received ignite command from " + port);
+                    Logging.log("-- " + this.getName() + "| received ignite command from " + port, 4);
                     // TODO: add multiple triggers
                     ignitePositions.add(port);
-                    Logging.log("-- " + this.getName() + "| transitioning to burning state");
+                    Logging.log("-- " + this.getName() + "| transitioning to burning state", 4);
                     state = State.BURNING;
-                    Logging.log("-- " + this.getName() + "| setting original timers");
+                    Logging.log("-- " + this.getName() + "| setting original timers", 4);
                     calculateTimers(port);
                 }
             }
         }
-        holdIn(state.toString(), 1);
+        if (startFire) {
+            holdIn("START", sigma_time);
+        } else {
+            holdIn(state.toString(), sigma_time);
+        }
     }
 
     /**
      * Calculate the timers for the edges of the cell to be reached based on ignite position, ROS and wind direction/speed
      */
     public void calculateTimers(String initPos) {
-        List<String> targetDirs = Arrays.stream(dirOutputs.get(initPos)).collect(Collectors.toList());
+        List<String> targetDirs = Arrays.stream(CellUtils.getOutputDirections(initPos)).collect(Collectors.toList());
 
         // Calculate the angles and distances between the initial position and the target directions
         List<Double> angles = new ArrayList<>(targetDirs.size());
         List<Double> distances = new ArrayList<>(targetDirs.size());
         for (String t : targetDirs) {
-            angles.add(Math.atan2((dirCoordinates.get(t)[1] - dirCoordinates.get(initPos)[1]), (dirCoordinates.get(t)[0] - dirCoordinates.get(initPos)[0])));
-            distances.add(AbsurdUnitConverter.m_to_ft(Math.sqrt((dirCoordinates.get(initPos)[0] - dirCoordinates.get(t)[0]) * (dirCoordinates.get(initPos)[0] - dirCoordinates.get(t)[0]) + (dirCoordinates.get(initPos)[1] - dirCoordinates.get(t)[1]) * (dirCoordinates.get(initPos)[1] - dirCoordinates.get(t)[1]))));
+            angles.add(Math.atan2((CellUtils.getCoordinates(t)[1] - CellUtils.getCoordinates(initPos)[1]), (CellUtils.getCoordinates(t)[0] - CellUtils.getCoordinates(initPos)[0])));
+            distances.add(AbsurdUnitConverter.m_to_ft(Math.sqrt((CellUtils.getCoordinates(initPos)[0] - CellUtils.getCoordinates(t)[0]) * (CellUtils.getCoordinates(initPos)[0] - CellUtils.getCoordinates(t)[0]) + (CellUtils.getCoordinates(initPos)[1] - CellUtils.getCoordinates(t)[1]) * (CellUtils.getCoordinates(initPos)[1] - CellUtils.getCoordinates(t)[1]))));
         }
-        Logging.log("-- " + this.getName() + "| Angles were calulated! " + angles.toString());
-        Logging.log("-- " + this.getName() + "| Distances were calulated! " + distances.toString());
+        Logging.log("-- " + this.getName() + "| Angles were calculated! " + angles.toString(), 4);
+        Logging.log("-- " + this.getName() + "| Distances were calculated! " + distances.toString(), 4);
 
         // Update the angles to the "new" coordinate system
         angles = angles.stream().map(a -> {
@@ -187,7 +168,7 @@ public class EnvironmentCell extends TwoDimCell {
             angleDiff += (angleDiff > Math.PI) ? (-2 * Math.PI) : (angleDiff < -Math.PI) ? (2 * Math.PI) : 0;
             return angleDiff;
         }).collect(Collectors.toList());
-        Logging.log("-- " + this.getName() + "| Angles were adjusted! " + angles.toString());
+        Logging.log("-- " + this.getName() + "| Angles were adjusted! " + angles.toString(), 4);
 
         angles.forEach(a -> {
             assert (a <= Math.PI && a >= -Math.PI);
@@ -199,17 +180,17 @@ public class EnvironmentCell extends TwoDimCell {
         for (Double a : angles) {
             scaledAngles.add((1 - e * e) * (1 - e * Math.cos(a + Math.PI)));
         }
-        Logging.log("-- " + this.getName() + "| Angles were scaled! " + scaledAngles.toString());
+        Logging.log("-- " + this.getName() + "| Angles were scaled! " + scaledAngles.toString(), 4);
         double maxAngle = ((1 - e * e) * (1 - e * Math.cos(Math.PI)));
         scaledAngles = scaledAngles.stream().map(a -> a / maxAngle).collect(Collectors.toList());
-        Logging.log("-- " + this.getName() + "| Angles were normalized! " + scaledAngles.toString());
+        Logging.log("-- " + this.getName() + "| Angles were normalized! " + scaledAngles.toString(), 4);
 
         // TODO: Calculate the current ROS
-        double ros = 4;
+        double ros = 20;
         for (int i = 0; i < targetDirs.size(); i++) {
-            outputTimers.put(targetDirs.get(i), distances.get(i) / (ros * scaledAngles.get(i)));
+            outputTimers.put(targetDirs.get(i), (distances.get(i) / (ros * scaledAngles.get(i))) * 60.0);
         }
-        Logging.log("-- " + this.getName() + "| Timings were calculated! " + outputTimers.toString());
+        Logging.log("-- " + this.getName() + "| Timings were calculated! " + outputTimers.toString(), 4);
     }
 
     /**
@@ -222,7 +203,7 @@ public class EnvironmentCell extends TwoDimCell {
                 double newTime = Math.max(this.outputTimers.get(k) - this.getSigma(), 0);
                 this.outputTimers.put(k, newTime);
             });
-            Logging.log("-- " + this.getName() + "| Current timers: " + this.outputTimers);
+            Logging.log("-- " + this.getName() + "| Current timers: " + this.outputTimers, 4);
         }
     }
 
@@ -236,14 +217,18 @@ public class EnvironmentCell extends TwoDimCell {
         this.outputTimers.keySet().forEach(k -> {
             if (this.outputTimers.get(k) <= 0) {
                 if (!igniteSent.contains(k)) {
-                    Logging.log("-- " + this.getName() + "| Sending ignite command to " + k);
+                    Logging.log("-- " + this.getName() + "| Sending ignite command to " + k, 4);
                     m.add(makeContent("out" + k, new Pair<>("status", "ignite")));
                     igniteSent.add(k);
                 }
             }
             if (igniteSent.size() == outputTimers.size()) {
                 state = State.BURNED;
-                holdIn(state.toString(), INFINITY);
+                if (startFire) {
+                    holdIn("START", INFINITY);
+                } else {
+                    holdIn(state.toString(), INFINITY);
+                }
             }
         });
         return m;

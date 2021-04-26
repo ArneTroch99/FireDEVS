@@ -9,5 +9,6 @@ public class EnvironmentCellUI {
         CAViewUI.addPhaseColor("UNBURNED", Color.WHITE);
         CAViewUI.addPhaseColor("BURNING", Color.RED);
         CAViewUI.addPhaseColor("UNBURNABLE", Color.BLACK);
+        CAViewUI.addPhaseColor("START", Color.GREEN);
     }
 }

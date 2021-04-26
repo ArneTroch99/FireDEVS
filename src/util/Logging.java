@@ -26,7 +26,7 @@ public class Logging
      * is meant to control what kinds (if any) of logging messages get
      * displayed on stdout.
      */
-    static public final int level = inputViolations;
+    static public final int level = fatal;
 
     /**
      * Writes the given message to stdout.
