@@ -17,7 +17,7 @@ public class FireEnvironment_TCP extends FireEnvironment {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             return in.readLine();
         } catch (IOException e) {
-            Logging.log("Could not read from the TCP connection, default dynamic values will be used. \n This happened be" +
+            Logging.log("ERROR: Could not read from the TCP connection, default dynamic values will be used. \n This happened be" +
                     "because of the following exception: \n " + e.toString(), Logging.error);
         }
         return "";
@@ -27,7 +27,7 @@ public class FireEnvironment_TCP extends FireEnvironment {
         try {
             socket = new Socket(localHost, port);
         } catch (IOException e) {
-            Logging.log("Could not open the TCP connection, default dynamic values will be used. \n This happened be" +
+            Logging.log("ERROR: Could not open the TCP connection, default dynamic values will be used. \n This happened be" +
                     "because of the following exception: \n " + e.toString(), Logging.error);
         }
     }
@@ -36,8 +36,9 @@ public class FireEnvironment_TCP extends FireEnvironment {
         try {
             socket.close();
         } catch (IOException e) {
-            Logging.log("Could not close the TCP connection. \n This happened be because of the following exception: \n " + e.toString(), Logging.error);
-        }
+            Logging.log("ERROR: Could not close the TCP connection. \n This happened be because of the following exception: \n "
+                    + e.toString(), Logging.error);
+        } catch (NullPointerException ignore){}     // This means the connection never opened
     }
 
 
