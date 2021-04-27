@@ -65,7 +65,7 @@ public class Logging
         // Write error or fatal messages to error.txt
         if (ifLevelAtLeast <= Logging.error) {
             try {
-                Files.write(errorPath, (dtf.format(LocalDateTime.now()) + ":\n" + message + "\n\n").getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
+                Files.write(errorPath, (dtf.format(LocalDateTime.now()) + ":\n" + message + "\n\n").getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND, StandardOpenOption.CREATE);
             } catch (IOException e) {
                 e.printStackTrace();
             }
