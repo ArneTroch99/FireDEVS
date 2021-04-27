@@ -39,17 +39,19 @@ public class JSONLoader {
 
         // Load a map with the fuel type as key and the fuel color (rgb array) as value
         String jsonString = readJSON(filePath);
-        Type empMapType = new TypeToken<Map<String, short[]>>() {}.getType();
-        Map<String, short[]> fuelColors = gson.fromJson(jsonString, empMapType);
+        Type empMapType = new TypeToken<Map<String, byte[]>>() {}.getType();
+        Map<String, byte[]> fuelColors = gson.fromJson(jsonString, empMapType);
 
         // Convert the rgb value from an array to one (4 byte) integer, where the first byte is alpha = 255
-        Integer colorInteger;
-        short[] rgb;
-        for (Map.Entry<String, short[]> entry: fuelColors.entrySet()){
+        byte[] rgb;
+        for (Map.Entry<String, byte[]> entry: fuelColors.entrySet()){
             rgb = entry.getValue();
-            colorInteger = ((byte)0xFF << 24) & (rgb[0] << 16) & (rgb[1] << 8) & rgb[2];
-
-            result.put(colorInteger, entry.getKey());       // Create the inverse hash map as result
+            int argb = 0;
+            argb += -16777216; // 255 alpha
+            argb += ((int) rgb[2] & 0xff); // blue
+            argb += (((int) rgb[1] & 0xff) << 8); // green
+            argb += (((int) rgb[0] & 0xff) << 16); // red
+            result.put(argb, entry.getKey());       // Create the inverse hash map as result
         }
         return result;
     }
