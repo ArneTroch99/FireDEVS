@@ -9,5 +9,9 @@ Usefull resources:
  - Original Rothermell paper: https://www.fs.fed.us/rm/pubs_int/int_rp115.pdf?fbclid=IwAR2zoRQIDdxgSL_OxlV0Z5weuGw8dbyzw1TrQa-bXp6RJRT1NXjLtYy8zUk
  - Fuel models: https://www.fs.fed.us/rm/pubs/rmrs_gtr153.pdf?fbclid=IwAR1KRhj51mhYMn2vL7cx-dAZwmXvyJKt1RRADv1JmxqFkJZC6xPqLCh1Auw
 
-Arne Troch and Siemen Herremans
-University project at the University of Antwerp
+
+
+
+
+*Arne Troch and Siemen Herremans,
+University project at the University of Antwerp*
