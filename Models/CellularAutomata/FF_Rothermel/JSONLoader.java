@@ -18,7 +18,7 @@ public class JSONLoader {
     private static Gson gson = new GsonBuilder().create();
 
     public static void main(String[] args) {
-        JSONLoader.loadVegetationColours("/home/siemen/FireDEVS/fuelColors.json");
+        JSONLoader.loadFuelModels("FuelData/FuelModels.json");
     }
 
     public static Map<String, FuelModel> loadFuelModels(String filePath){
