@@ -1,6 +1,5 @@
 package CellularAutomata.FF_Rothermel;
 
-import FF_Rothermel.FireEnvironment;
 import GenCol.Pair;
 import model.modeling.CAModels.TwoDimCell;
 import model.modeling.message;
@@ -47,7 +46,7 @@ public class EnvironmentCell extends TwoDimCell {
         super(xcoord, ycoord);
     }
 
-    public void setFuelmodel(FuelModel fuelModel){
+    public void setFuelmodel(FuelModel fuelModel) {
         this.w_o = AbsurdUnitConverter.t_ac_to_lb_ftsqrd(fuelModel.getFine_fuel_load());
         this.delta = fuelModel.getFuel_bed_depth();
         this.sigma = fuelModel.getSAV();
@@ -56,7 +55,7 @@ public class EnvironmentCell extends TwoDimCell {
         this.M_x = fuelModel.getExtinction_moisture_content();
     }
 
-    public void setRosCalculator(ROS_Calculator rosCalculator){
+    public void setRosCalculator(ROS_Calculator rosCalculator) {
         this.rosCalculator = rosCalculator;
     }
 
@@ -70,17 +69,14 @@ public class EnvironmentCell extends TwoDimCell {
             ignitePositions.add("C");
             calculateTimers("C");
             holdIn("START", sigma_time);
+        } else if (M_x == 0){
+            state = State.UNBURNABLE;
+            holdIn(state.toString(), INFINITY);
         } else {
-            // Temporary way to add some unburnable cells
-            Random rand = new Random();
-            if (rand.nextInt(100) < 5) {
-                state = State.UNBURNABLE;
-            } else {
-                state = State.UNBURNED;
-            }
+            state = State.UNBURNED;
             holdIn(state.toString(), INFINITY);
         }
-        Logging.log("-- " + this.getName() + "| Initialized cell in state: " + state  + " with sav " + sigma, Logging.debug);
+        Logging.log("-- " + this.getName() + "| Initialized cell in state: " + state + " with sav " + sigma, Logging.debug);
 
         EnvironmentCellUI.setPhaseColor();
     }
@@ -189,7 +185,7 @@ public class EnvironmentCell extends TwoDimCell {
         for (int i = 0; i < targetDirs.size(); i++) {
             double newTime = (distances.get(i) / (ros * scaledAngles.get(i))) * 60.0;
             String target = targetDirs.get(i);
-            if ((outputTimers.get(target) == null) || (newTime < outputTimers.get(target)) && !(outputTimers.get(target) <= 0)){
+            if ((outputTimers.get(target) == null) || (newTime < outputTimers.get(target)) && !(outputTimers.get(target) <= 0)) {
                 outputTimers.put(target, newTime);
             }
         }

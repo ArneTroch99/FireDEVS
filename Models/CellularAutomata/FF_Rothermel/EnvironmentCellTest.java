@@ -10,22 +10,22 @@ public class EnvironmentCellTest extends TwoDimCellSpace {
         this(100, 100);
     }
 
-    public EnvironmentCellTest(int xDim, int yDim) {
-        super("moor", xDim, yDim);
-        this.numCells = xDim * yDim;
+    public EnvironmentCellTest(int rows, int columns) {
+        super("moor", rows, columns);
+        this.numCells = rows * columns;
 
-        FuelModel[][] fuelModels = ImageInterpreter.readImage(xDim, yDim);
+        FuelModel[][] fuelModels = ImageInterpreter.readImage(rows, columns);
         CellUtils.init(5, 5, 100);
         ROS_Calculator rosCalculator = new ROS_Calculator();
 
         for (int i = 0; i < xDimCellspace; i++) {
             for (int j = 0; j < yDimCellspace; j++) {
-                EnvironmentCell cell = new EnvironmentCell(i, j);
+                EnvironmentCell cell = new EnvironmentCell(j, i);
                 addCell(cell);
-                if (i == xDim / 2 && j == yDim / 2) {
+                if (i == rows / 2 && j == columns / 2) {
                     cell.setStartFire(true);
                 }
-                cell.setFuelmodel(fuelModels[i][j]);
+                cell.setFuelmodel(fuelModels[j][i]);
                 cell.setRosCalculator(rosCalculator);
             }
         }

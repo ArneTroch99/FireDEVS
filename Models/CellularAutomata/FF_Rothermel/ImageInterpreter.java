@@ -34,7 +34,7 @@ public class ImageInterpreter {
         Map<String, FuelModel> nameToModel = JSONLoader.loadFuelModels("FuelData/FuelModels.json");
 
         try {
-            image = ImageIO.read(new File("/home/arne/Downloads/Test_moor_clean.png"));
+            image = ImageIO.read(new File("/home/arne/Downloads/Test_moor_water.png"));
         } catch (IOException e) {
             Logging.log("ERROR: The provided image could not be opened! Resulting exception: \n" + e.toString(), Logging.error);
             return new FuelModel[1][1];    // Return an empty map to avoid crash
