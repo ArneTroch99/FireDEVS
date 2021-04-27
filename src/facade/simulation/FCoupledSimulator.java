@@ -217,16 +217,9 @@ public class FCoupledSimulator implements FSimulator
             	checkSuspended(); 
                 // for each iteration this coordinator was told to do,
                 // stopping early if there are no more next events to process
-            	
-            	
+
                 int i = 1;
                 tN = nextTN();
-                
-                
-                
-        		// add CPU time counting
-        		long startTime = System.currentTimeMillis();
-        		//System.out.println("CPU Start Time: " + startTime);
 
                 while (tN < INFINITY && i <= numIter) {
                     
@@ -242,6 +235,7 @@ public class FCoupledSimulator implements FSimulator
 
                     // sleep for that amount
                     Util.sleep(myThread, timeToSleep);
+                    //Util.sleep(myThread, 0);
                     
                  		//sync graphs
                     Governor.syncGraphs();
@@ -288,12 +282,6 @@ public class FCoupledSimulator implements FSimulator
                 // the iterations have now been completed
                 System.out.println("Terminated Normally before ITERATION " + i +
                     " ,time: "+ getTimeOfLastEvent());
-                
-                //print out the CPU computing time
-        		long endTime = System.currentTimeMillis();
-
-        		//System.out.println("CPU End Time: " + endTime);
-        		//System.out.println("CPU Computing Time (seconds): " + ((float)(endTime - startTime)/1000));     			
                 
                 shouldIterate = false;                
                           

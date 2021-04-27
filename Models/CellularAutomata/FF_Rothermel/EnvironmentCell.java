@@ -1,5 +1,6 @@
 package CellularAutomata.FF_Rothermel;
 
+import FF_Rothermel.FireEnvironment;
 import GenCol.Pair;
 import model.modeling.CAModels.TwoDimCell;
 import model.modeling.message;
@@ -147,6 +148,7 @@ public class EnvironmentCell extends TwoDimCell {
      */
     public void calculateTimers(String initPos) {
         List<String> targetDirs = Arrays.stream(CellUtils.getOutputDirections(initPos)).collect(Collectors.toList());
+        CellUtils.updateParameters();
 
         // Calculate the angles and distances between the initial position and the target directions
         List<Double> angles = new ArrayList<>(targetDirs.size());
@@ -159,8 +161,9 @@ public class EnvironmentCell extends TwoDimCell {
         Logging.log("-- " + this.getName() + "| Distances were calculated! " + distances.toString(), Logging.debug);
 
         // Update the angles to the "new" coordinate system
+        double windDir = CellUtils.getWindDir();
         angles = angles.stream().map(a -> {
-            double angleDiff = a - CellUtils.getWindDir();
+            double angleDiff = a - windDir;
             angleDiff += (angleDiff > Math.PI) ? (-2 * Math.PI) : (angleDiff < -Math.PI) ? (2 * Math.PI) : 0;
             return angleDiff;
         }).collect(Collectors.toList());

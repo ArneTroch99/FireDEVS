@@ -58,13 +58,13 @@ public abstract class FireEnvironment {
 
     private void stub(){
         if(!parameters.containsKey("moisture")){
-            parameters.put("moisture", 0.4);
+            parameters.put("moisture", 0.12);
         }
         if(!parameters.containsKey("winddir")){
-            parameters.put("winddir", 1.4);
+            parameters.put("winddir", -1.75);
         }
         if(!parameters.containsKey("windspeed")){
-            parameters.put("windspeed", 25.0);
+            parameters.put("windspeed", 95.0);
         }
     }
 

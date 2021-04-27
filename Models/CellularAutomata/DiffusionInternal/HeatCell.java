@@ -46,7 +46,7 @@ public class HeatCell extends TwoDimCell {
 	 */
 
 	public void deltext(double e, message x) {
-		// long startTime = System.currentTimeMillis();
+		long startTime = System.currentTimeMillis();
 		Continue(e);
 		Iterator it = x.iterator();
 		while (it.hasNext()) {
@@ -66,8 +66,8 @@ public class HeatCell extends TwoDimCell {
 		}
 		HeatValue = 0;
 
-		// long endTime = System.currentTimeMillis();
-		// Life3Trans.cellExtTime += endTime - startTime;
+		long endTime = System.currentTimeMillis();
+		//Life3Trans.cellExtTime += endTime - startTime;
 
 	}
 

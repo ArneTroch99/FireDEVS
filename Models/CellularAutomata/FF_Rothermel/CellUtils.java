@@ -1,5 +1,9 @@
 package CellularAutomata.FF_Rothermel;
 
+import FF_Rothermel.FireEnvironment;
+import FF_Rothermel.FireEnvironment_TCP;
+import util.Logging;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,6 +12,8 @@ public class CellUtils {
     private static final HashMap<String, String[]> dirOutputs = new HashMap<>(8);
     private static final Map<String, double[]> dirCoordinates = new HashMap<>(8);
     private static double maxWindSpeed;
+    private static FireEnvironment fireEnvironment;
+    private static Map<String, Double> parameters;
 
     public static void init(double cellWidth, double cellHeight, double maxWindSpeed) {
         dirOutputs.put("N", new String[]{"NE", "E", "SE", "S", "SW", "W", "NW"});
@@ -32,6 +38,12 @@ public class CellUtils {
 
         CellUtils.maxWindSpeed = maxWindSpeed;
 
+        CellUtils.fireEnvironment = new FireEnvironment_TCP();
+        fireEnvironment.connect();
+    }
+
+    public static void disconnect() {
+        fireEnvironment.disconnect();
     }
 
     public static String[] getOutputDirections(String inputDir) {
@@ -42,20 +54,25 @@ public class CellUtils {
         return dirCoordinates.get(dir);
     }
 
-    public static double getWindDir(){
-        return -Math.PI / 4;
+    public static void updateParameters() {
+        parameters = fireEnvironment.getParameters();
+        Logging.log("New parameters were received: " + parameters, Logging.error);
     }
 
-    public static double getWindSpeed(){
-        return AbsurdUnitConverter.km_h_to_ft_min(20);
+    public static double getWindDir() {
+        return parameters.get("winddir");
     }
 
-    public static double getMoisture(){
-        return 0.14;
+    public static double getWindSpeed() {
+        return AbsurdUnitConverter.km_h_to_ft_min(parameters.get("windspeed"));
     }
 
-    public static double getE(){
-        return AbsurdUnitConverter.km_h_to_ft_min(20)/maxWindSpeed;
+    public static double getMoisture() {
+        return parameters.get("moisture");
+    }
+
+    public static double getE() {
+        return AbsurdUnitConverter.km_h_to_ft_min(parameters.get("windspeed")) / AbsurdUnitConverter.km_h_to_ft_min(maxWindSpeed);
     }
 
 }

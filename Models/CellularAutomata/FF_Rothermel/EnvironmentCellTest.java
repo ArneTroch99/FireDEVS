@@ -1,11 +1,13 @@
 package CellularAutomata.FF_Rothermel;
 
+import FF_Rothermel.FireEnvironment;
+import FF_Rothermel.FireEnvironment_TCP;
 import model.modeling.CAModels.TwoDimCellSpace;
 
 public class EnvironmentCellTest extends TwoDimCellSpace {
 
     public EnvironmentCellTest() {
-        this(10, 10);
+        this(100, 100);
     }
 
     public EnvironmentCellTest(int xDim, int yDim) {
@@ -13,7 +15,7 @@ public class EnvironmentCellTest extends TwoDimCellSpace {
         this.numCells = xDim * yDim;
 
         FuelModel[][] fuelModels = ImageInterpreter.readImage(xDim, yDim);
-        CellUtils.init(2, 2, 100);
+        CellUtils.init(5, 5, 100);
         ROS_Calculator rosCalculator = new ROS_Calculator();
 
         for (int i = 0; i < xDimCellspace; i++) {

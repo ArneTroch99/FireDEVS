@@ -28,7 +28,7 @@ public class Stopwatch
 	
 	public static double getTime()
 	{
-		return (end!=-1)?(begin-end)/1000.0:-1;
+		return (end!=-1)?(begin-end):-1;
 	}
 	
 	public static void reset()
