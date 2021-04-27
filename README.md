@@ -15,3 +15,4 @@ Usefull resources:
 
 *Arne Troch and Siemen Herremans,
 University project at the University of Antwerp*
+*Supervised by: Joachim Denil and Jan Steckel*
