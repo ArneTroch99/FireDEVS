@@ -2,7 +2,7 @@ package CellularAutomata.FF_Rothermel;
 
 import util.Logging;
 
-import javax.imageio.*;
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -30,11 +30,11 @@ public class ImageInterpreter {
 
         FuelModel[][] result = new FuelModel[nRow][nCol];
         BufferedImage image;
-        Map<Integer, String> rgbToVegetation = JSONLoader.loadVegetationColours("/home/siemen/FireDEVS/fuelColors.json");
-        Map<String, FuelModel> nameToModel = JSONLoader.loadFuelModels("/home/siemen/FireDEVS/FuelModels.json");
+        Map<Integer, String> rgbToVegetation = JSONLoader.loadVegetationColours("/home/arne/Documents/CPS/FireDEVS/fuelColors.json");
+        Map<String, FuelModel> nameToModel = JSONLoader.loadFuelModels("/home/arne/Documents/CPS/FireDEVS/FuelModels.json");
 
         try {
-            image = ImageIO.read(new File("/home/siemen/FireDEVS/appel.png"));
+            image = ImageIO.read(new File("/home/arne/Downloads/Test_moor.png"));
         } catch (IOException e) {
             Logging.log("ERROR: The provided image could not be opened! Resulting exception: \n" + e.toString(), Logging.error);
             return new FuelModel[1][1];    // Return an empty map to avoid crash

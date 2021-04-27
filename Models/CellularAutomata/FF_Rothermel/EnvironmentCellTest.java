@@ -1,25 +1,30 @@
 package CellularAutomata.FF_Rothermel;
 
-import GenCol.Pair;
 import model.modeling.CAModels.TwoDimCellSpace;
 
 public class EnvironmentCellTest extends TwoDimCellSpace {
 
     public EnvironmentCellTest() {
-        this(100, 100);
+        this(10, 10);
     }
 
     public EnvironmentCellTest(int xDim, int yDim) {
         super("moor", xDim, yDim);
         this.numCells = xDim * yDim;
-        CellUtils.init(2, 2);
+
+        FuelModel[][] fuelModels = ImageInterpreter.readImage(xDim, yDim);
+        CellUtils.init(2, 2, 100);
+        ROS_Calculator rosCalculator = new ROS_Calculator();
+
         for (int i = 0; i < xDimCellspace; i++) {
             for (int j = 0; j < yDimCellspace; j++) {
                 EnvironmentCell cell = new EnvironmentCell(i, j);
                 addCell(cell);
-                if (i == 49 && j == 49){
+                if (i == xDim / 2 && j == yDim / 2) {
                     cell.setStartFire(true);
                 }
+                cell.setFuelmodel(fuelModels[i][j]);
+                cell.setRosCalculator(rosCalculator);
             }
         }
         doNeighborToNeighborCoupling();

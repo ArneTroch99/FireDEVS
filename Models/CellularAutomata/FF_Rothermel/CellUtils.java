@@ -7,8 +7,9 @@ public class CellUtils {
 
     private static final HashMap<String, String[]> dirOutputs = new HashMap<>(8);
     private static final Map<String, double[]> dirCoordinates = new HashMap<>(8);
+    private static double maxWindSpeed;
 
-    public static void init(double cellWidth, double cellHeight) {
+    public static void init(double cellWidth, double cellHeight, double maxWindSpeed) {
         dirOutputs.put("N", new String[]{"NE", "E", "SE", "S", "SW", "W", "NW"});
         dirOutputs.put("E", new String[]{"N", "NE", "SE", "S", "SW", "W", "NW"});
         dirOutputs.put("S", new String[]{"N", "NE", "E", "SE", "SW", "W", "NW"});
@@ -29,6 +30,8 @@ public class CellUtils {
         dirCoordinates.put("NW", new double[]{0, 0});
         dirCoordinates.put("C", new double[]{cellWidth / 2, -cellHeight / 2});
 
+        CellUtils.maxWindSpeed = maxWindSpeed;
+
     }
 
     public static String[] getOutputDirections(String inputDir) {
@@ -37,6 +40,22 @@ public class CellUtils {
 
     public static double[] getCoordinates(String dir) {
         return dirCoordinates.get(dir);
+    }
+
+    public static double getWindDir(){
+        return -Math.PI / 4;
+    }
+
+    public static double getWindSpeed(){
+        return AbsurdUnitConverter.km_h_to_ft_min(20);
+    }
+
+    public static double getMoisture(){
+        return 0.14;
+    }
+
+    public static double getE(){
+        return AbsurdUnitConverter.km_h_to_ft_min(20)/maxWindSpeed;
     }
 
 }
