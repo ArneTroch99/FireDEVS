@@ -30,8 +30,8 @@ public class ImageInterpreter {
 
         FuelModel[][] result = new FuelModel[nRow][nCol];
         BufferedImage image;
-        Map<Integer, String> rgbToVegetation = JSONLoader.loadVegetationColours("/home/arne/Documents/CPS/FireDEVS/fuelColors.json");
-        Map<String, FuelModel> nameToModel = JSONLoader.loadFuelModels("/home/arne/Documents/CPS/FireDEVS/FuelModels.json");
+        Map<Integer, String> rgbToVegetation = JSONLoader.loadVegetationColours("FuelData/fuelColors.json");
+        Map<String, FuelModel> nameToModel = JSONLoader.loadFuelModels("FuelData/FuelModels.json");
 
         try {
             image = ImageIO.read(new File("/home/arne/Downloads/Test_moor_clean.png"));
