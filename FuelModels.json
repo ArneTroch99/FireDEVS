@@ -3,19 +3,25 @@
     "fine_fuel_load": 0.4,
     "SAV": 2054,
     "packing_ratio": 0.00143,
-    "extinction_moisture_content": 0.15
+    "extinction_moisture_content": 0.15,
+    "fuel_bed_depth": 0.4,
+    "heat_content": 8000
   },
   "GR2": {
     "fine_fuel_load": 1.10,
     "SAV": 1820,
     "packing_ratio": 0.00158,
-    "extinction_moisture_content": 0.15
+    "extinction_moisture_content": 0.15,
+    "fuel_bed_depth": 1.0,
+    "heat_content": 8000
   },
 
   "SH6": {
     "fine_fuel_load": 4.3,
     "SAV": 1144,
     "packing_ratio": 0.00412,
-    "extinction_moisture_content": 0.30
+    "extinction_moisture_content": 0.30,
+    "fuel_bed_depth": 2.0,
+    "heat_content": 8000
   }
 }
