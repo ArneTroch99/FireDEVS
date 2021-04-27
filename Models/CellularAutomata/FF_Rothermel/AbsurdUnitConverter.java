@@ -16,5 +16,10 @@ public class AbsurdUnitConverter {
     public static double m_to_ft(double m) {
         return 3.28084 * m;
     }
+
+    // Convert km/h to ft/min
+    public static double km_h_to_ft_min(double km){
+        return km * 54.6806649;
+    }
 }
 

@@ -10,10 +10,6 @@ import java.util.stream.Collectors;
 
 public class EnvironmentCell extends TwoDimCell {
 
-    // Environmental variables
-    private final double windDir = -Math.PI / 4;  // The direction of the wind TODO: Change based on wind direction
-    private final double e = 0.9; // Determines the layout of the ellipse TODO: change this value based on the wind speed
-
     // Cell-variables
     // The positions where the cell has been ignited
     private final List<String> ignitePositions = new ArrayList<>();
@@ -33,11 +29,12 @@ public class EnvironmentCell extends TwoDimCell {
 
     // Rothermel variables
     private double w_o;
+    private double delta;
     private double sigma;
     private double h;
-    private double M_f;
-    private double U;
     private double beta;
+    private double M_f;
+    private double tan_phi = 0; // TODO: Change this value based on the slope
     private double M_x;
     private ROS_Calculator rosCalculator;
 
@@ -49,15 +46,16 @@ public class EnvironmentCell extends TwoDimCell {
         super(xcoord, ycoord);
     }
 
-    public EnvironmentCell(int xcoord, int ycoord, double w_o, double sigma, double h, double M_f, double U, double beta, double M_x, ROS_Calculator rosCalculator) {
-        super(xcoord, ycoord);
-        this.w_o = w_o;
-        this.sigma = sigma;
-        this.h = h;
-        this.M_f = M_f;
-        this.U = U;
-        this.beta = beta;
-        this.M_x = M_x;
+    public void setFuelmodel(FuelModel fuelModel){
+        this.w_o = AbsurdUnitConverter.t_ac_to_lb_ftsqrd(fuelModel.getFine_fuel_load());
+        this.delta = fuelModel.getFuel_bed_depth();
+        this.sigma = fuelModel.getSAV();
+        this.h = fuelModel.getHeat_content();
+        this.beta = fuelModel.getPacking_ratio();
+        this.M_x = fuelModel.getExtinction_moisture_content();
+    }
+
+    public void setRosCalculator(ROS_Calculator rosCalculator){
         this.rosCalculator = rosCalculator;
     }
 
@@ -66,8 +64,6 @@ public class EnvironmentCell extends TwoDimCell {
      */
     public void initialize() {
         super.initialize();
-        Logging.log("-- " + this.getName() + "| Initializing cell in state: " + state, 5);
-
         if (startFire) {
             state = State.BURNING;
             ignitePositions.add("C");
@@ -83,6 +79,7 @@ public class EnvironmentCell extends TwoDimCell {
             }
             holdIn(state.toString(), INFINITY);
         }
+        Logging.log("-- " + this.getName() + "| Initialized cell in state: " + state  + " with sav " + sigma, Logging.debug);
 
         EnvironmentCellUI.setPhaseColor();
     }
@@ -129,11 +126,11 @@ public class EnvironmentCell extends TwoDimCell {
                     port = "NW";
                 }
                 if (inpair != null && inpair.getValue().toString().equals("ignite")) {
-                    Logging.log("-- " + this.getName() + "| received ignite command from " + port, 4);
+                    Logging.log("-- " + this.getName() + "| received ignite command from " + port, Logging.debug);
                     ignitePositions.add(port);
-                    Logging.log("-- " + this.getName() + "| transitioning to burning state", 4);
+                    Logging.log("-- " + this.getName() + "| transitioning to burning state", Logging.debug);
                     state = State.BURNING;
-                    Logging.log("-- " + this.getName() + "| setting original timers", 4);
+                    Logging.log("-- " + this.getName() + "| setting original timers", Logging.debug);
                     calculateTimers(port);
                 }
             }
@@ -158,16 +155,16 @@ public class EnvironmentCell extends TwoDimCell {
             angles.add(Math.atan2((CellUtils.getCoordinates(t)[1] - CellUtils.getCoordinates(initPos)[1]), (CellUtils.getCoordinates(t)[0] - CellUtils.getCoordinates(initPos)[0])));
             distances.add(AbsurdUnitConverter.m_to_ft(Math.sqrt((CellUtils.getCoordinates(initPos)[0] - CellUtils.getCoordinates(t)[0]) * (CellUtils.getCoordinates(initPos)[0] - CellUtils.getCoordinates(t)[0]) + (CellUtils.getCoordinates(initPos)[1] - CellUtils.getCoordinates(t)[1]) * (CellUtils.getCoordinates(initPos)[1] - CellUtils.getCoordinates(t)[1]))));
         }
-        Logging.log("-- " + this.getName() + "| Angles were calculated! " + angles.toString(), 4);
-        Logging.log("-- " + this.getName() + "| Distances were calculated! " + distances.toString(), 4);
+        Logging.log("-- " + this.getName() + "| Angles were calculated! " + angles.toString(), Logging.debug);
+        Logging.log("-- " + this.getName() + "| Distances were calculated! " + distances.toString(), Logging.debug);
 
         // Update the angles to the "new" coordinate system
         angles = angles.stream().map(a -> {
-            double angleDiff = a - windDir;
+            double angleDiff = a - CellUtils.getWindDir();
             angleDiff += (angleDiff > Math.PI) ? (-2 * Math.PI) : (angleDiff < -Math.PI) ? (2 * Math.PI) : 0;
             return angleDiff;
         }).collect(Collectors.toList());
-        Logging.log("-- " + this.getName() + "| Angles were adjusted! " + angles.toString(), 4);
+        Logging.log("-- " + this.getName() + "| Angles were adjusted! " + angles.toString(), Logging.debug);
 
         angles.forEach(a -> {
             assert (a <= Math.PI && a >= -Math.PI);
@@ -175,17 +172,17 @@ public class EnvironmentCell extends TwoDimCell {
 
         // Calculate the scaled angles using the ellipse
         List<Double> scaledAngles = new ArrayList<>(targetDirs.size());
+        double e = CellUtils.getE();
         assert (e > 0.0 && e < 1.0);
         for (Double a : angles) {
             scaledAngles.add((1 - e * e) * (1 - e * Math.cos(a + Math.PI)));
         }
-        Logging.log("-- " + this.getName() + "| Angles were scaled! " + scaledAngles.toString(), 4);
+        Logging.log("-- " + this.getName() + "| Angles were scaled! " + scaledAngles.toString(), Logging.debug);
         double maxAngle = ((1 - e * e) * (1 - e * Math.cos(Math.PI)));
         scaledAngles = scaledAngles.stream().map(a -> a / maxAngle).collect(Collectors.toList());
-        Logging.log("-- " + this.getName() + "| Angles were normalized! " + scaledAngles.toString(), 4);
+        Logging.log("-- " + this.getName() + "| Angles were normalized! " + scaledAngles.toString(), Logging.debug);
 
-        // TODO: Calculate the current ROS
-        double ros = 4;
+        double ros = rosCalculator.calculate_ROS(w_o, delta, sigma, h, beta, CellUtils.getMoisture(), CellUtils.getWindSpeed(), tan_phi, M_x);
         for (int i = 0; i < targetDirs.size(); i++) {
             double newTime = (distances.get(i) / (ros * scaledAngles.get(i))) * 60.0;
             String target = targetDirs.get(i);
@@ -194,7 +191,7 @@ public class EnvironmentCell extends TwoDimCell {
             }
         }
         outputTimers.put(initPos, 0.0);
-        Logging.log("-- " + this.getName() + "| Timings were calculated! " + outputTimers.toString(), 4);
+        Logging.log("-- " + this.getName() + "| Timings were calculated! " + outputTimers.toString(), Logging.debug);
     }
 
     /**
@@ -207,7 +204,7 @@ public class EnvironmentCell extends TwoDimCell {
                 double newTime = Math.max(this.outputTimers.get(k) - this.getSigma(), 0);
                 this.outputTimers.put(k, newTime);
             });
-            Logging.log("-- " + this.getName() + "| Current timers: " + this.outputTimers, 4);
+            Logging.log("-- " + this.getName() + "| Current timers: " + this.outputTimers, Logging.debug);
         }
     }
 
@@ -221,7 +218,7 @@ public class EnvironmentCell extends TwoDimCell {
         this.outputTimers.keySet().forEach(k -> {
             if (this.outputTimers.get(k) <= 0) {
                 if (!igniteSent.contains(k)) {
-                    Logging.log("-- " + this.getName() + "| Sending ignite command to " + k, 4);
+                    Logging.log("-- " + this.getName() + "| Sending ignite command to " + k, Logging.debug);
                     m.add(makeContent("out" + k, new Pair<>("status", "ignite")));
                     igniteSent.add(k);
                 }
