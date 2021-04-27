@@ -15,7 +15,6 @@
     "fuel_bed_depth": 1.0,
     "heat_content": 8000
   },
-
   "SH6": {
     "fine_fuel_load": 4.3,
     "SAV": 1144,
@@ -23,5 +22,13 @@
     "extinction_moisture_content": 0.30,
     "fuel_bed_depth": 2.0,
     "heat_content": 8000
+  },
+  "unburnable": {
+    "fine_fuel_load": 0,
+    "SAV": 0,
+    "packing_ratio": 0,
+    "extinction_moisture_content": 0,
+    "fuel_bed_depth": 0,
+    "heat_content": 0
   }
 }
