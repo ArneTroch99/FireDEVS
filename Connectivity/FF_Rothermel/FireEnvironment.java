@@ -34,7 +34,7 @@ public abstract class FireEnvironment {
     /**
      * This method reads data from the connection that was opened by "connect()". The data should be read as a line
      * that ends with "\n" (eg. using the readLine() of the BufferedReader class).
-     * @return
+     * @return The received string from the connection.
      */
     protected abstract String receiveStringData();
 
