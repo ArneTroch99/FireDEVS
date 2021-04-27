@@ -13,6 +13,6 @@ Usefull resources:
 
 
 
-*Arne Troch and Siemen Herremans,
-University project at the University of Antwerp*
+*Arne Troch and Siemen Herremans,<br/>
+University project at the University of Antwerp*<br/><br/>
 *Supervised by: Joachim Denil and Jan Steckel*
